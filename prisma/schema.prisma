@@ -1,0 +1,2 @@
+// Prisma has been removed from this project.
+// Data access now uses the MongoDB Node.js driver directly.
