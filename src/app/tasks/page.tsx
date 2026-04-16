@@ -148,6 +148,15 @@ const modalMultiSelectStyles: StylesConfig<SyncUserOption, true> = {
 
 export default function TasksPage() {
   const { data: session } = useSession();
+  const toDateInputValue = (value: string | Date) => {
+    const d = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const todayDate = toDateInputValue(new Date());
   const isManager = session?.user?.role === 'leader' || session?.user?.role === 'admin';
   const isAdmin = session?.user?.role === 'admin';
   const searchParams = useSearchParams();
@@ -245,11 +254,11 @@ export default function TasksPage() {
   const [priority, setPriority] = useState('high');
   const [timeUsedHours, setTimeUsedHours] = useState('');
   const [timeAutoCalculatedInForm, setTimeAutoCalculatedInForm] = useState(false);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(todayDate);
   const shouldShowTimeUsedField = editingTask ? true : status === 'done';
 
   // Filter
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [filterDate, setFilterDate] = useState(todayDate);
   const [filterProjectIds, setFilterProjectIds] = useState<string[]>([]);
   const [filterUserIds, setFilterUserIds] = useState<string[]>([]);
   const [groupBy, setGroupBy] = useState<'project' | 'member'>('project');
@@ -373,7 +382,7 @@ export default function TasksPage() {
     setPriority('high');
     setTimeUsedHours('');
     setTimeAutoCalculatedInForm(false);
-    setDate(filterDate || new Date().toISOString().split('T')[0]);
+    setDate(filterDate || todayDate);
     setModalOpen(true);
   };
 
@@ -387,7 +396,7 @@ export default function TasksPage() {
     setPriority(task.priority || 'high');
     setTimeUsedHours(formatHoursForInput(task.timeUsedHours));
     setTimeAutoCalculatedInForm(Boolean(task.timeAutoCalculated));
-    setDate(task.date.split('T')[0]);
+    setDate(toDateInputValue(task.date));
     setModalOpen(true);
   };
 
